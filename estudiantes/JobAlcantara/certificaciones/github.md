@@ -1,8 +1,6 @@
-# Certificación GitHub Concepts
-
-**Estudiante:** Tu Nombre
-**Fecha:** 2026-01-29
+**Estudiante:** Job Alcántara Zepeda
+**Fecha:**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     %2026-%01-                          %29
 
 ## Evidencia
 
-![Certificado GitHub](./evidencia_github.png)
+![Certificado GitHub](./certificado_intermedio.png)
