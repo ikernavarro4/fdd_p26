@@ -109,22 +109,33 @@ Un contenedor virtualiza **solo el sistema operativo**. Todos los contenedores c
 
 No necesitas entender los detalles internos para **usar** contenedores, pero saber que existen te ayuda a entender **por qué** funcionan como funcionan.
 
+Ya vimos que un contenedor es un proceso aislado que comparte el kernel del host. Pero, ¿cómo logra el kernel aislar un proceso del resto del sistema? Con dos mecanismos: **namespaces** y **cgroups**. Cada uno resuelve una pregunta distinta:
+
+- **Namespaces** -> ¿Qué puede **ver** el proceso?
+- **cgroups** -> ¿Cuánto puede **usar** el proceso?
+
 ### Namespaces: aislación de visibilidad
 
-Los namespaces hacen que un proceso vea solo **su propia versión** del sistema. Es como ponerle lentes que solo le dejan ver lo que le corresponde.
+Normalmente, cualquier proceso en Linux puede ver a todos los demás procesos, la red completa, y el sistema de archivos entero. Los **namespaces** cambian esto: le dan a un proceso **su propia vista privada** de una parte del sistema.
 
-| Namespace | ¿Qué aísla? | Ejemplo |
-|-----------|-------------|---------|
-| **PID** | Procesos | El contenedor ve su proceso como PID 1, no ve los demás procesos del host |
-| **NET** | Red | El contenedor tiene su propia IP, sus propios puertos |
-| **MNT** | Sistema de archivos | El contenedor ve su propio `/` sin acceso al filesystem del host |
-| **USER** | Usuarios | root dentro del contenedor ≠ root en el host |
-| **UTS** | Hostname | El contenedor tiene su propio nombre de máquina |
-| **IPC** | Comunicación entre procesos | Memoria compartida aislada |
+Imagina que vives en un departamento. El edificio (kernel) es uno solo, pero cada departamento (namespace) tiene su propia puerta, su propio número, y desde adentro no puedes ver lo que pasa en el departamento de al lado. Los namespaces funcionan igual: el kernel es uno solo, pero cada contenedor tiene su propia "ventana" al sistema.
+
+Linux ofrece varios tipos de namespaces, cada uno aísla un aspecto diferente:
+
+| Namespace | ¿Qué aísla? | Sin namespace | Con namespace |
+|-----------|-------------|---------------|---------------|
+| **PID** | Procesos | El proceso ve todos los procesos del sistema | El proceso solo ve los suyos; cree que es PID 1 |
+| **NET** | Red | El proceso comparte IP y puertos con todos | El proceso tiene su propia IP y puertos |
+| **MNT** | Sistema de archivos | El proceso ve todo el disco | El proceso ve solo su propio `/`, como si fuera otra máquina |
+| **USER** | Usuarios | root es root en todo el sistema | root dentro del contenedor **no** es root en el host |
+| **UTS** | Hostname | Todos comparten el nombre de la máquina | El proceso tiene su propio hostname |
+| **IPC** | Comunicación entre procesos | Cualquier proceso puede comunicarse con otro vía memoria compartida | La memoria compartida es privada por contenedor |
 
 ### cgroups: limitación de recursos
 
-Los cgroups (control groups) limitan **cuánto** puede usar un proceso. Sin cgroups, un contenedor podría consumir toda la memoria o CPU del host.
+Los namespaces controlan lo que un proceso puede *ver*, pero no lo que puede *consumir*. Sin restricciones, un solo contenedor podría usar toda la memoria RAM o acaparar todos los cores del CPU, afectando a los demás contenedores y al propio host.
+
+Los **cgroups** (abreviación de *control groups*) resuelven esto: son el mecanismo del kernel que pone **límites cuantitativos** a los recursos que un proceso puede usar. Piensa en los cgroups como el medidor de luz de tu departamento: puedes usar electricidad, pero si te pasas del límite, se corta.
 
 ```bash
 # Ejemplo: limitar un contenedor a 512MB de RAM y 1 CPU
