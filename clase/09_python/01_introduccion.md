@@ -7,6 +7,32 @@ Python es el lenguaje dominante en ciencia de datos, machine learning, automatiz
 
 En esta sección no vamos a escribir programas todavía. Vamos a entender **cómo funciona Python como herramienta**: cómo ejecutarlo, cómo manejar dependencias, y cómo organizar tu entorno de trabajo.
 
+## ¿Qué es Python (sin humo, en 5 min)?
+
+Python es un **lenguaje de alto nivel** diseñado para ser legible y productivo. La mayoría de la gente lo describe como “interpretado”, y en la práctica eso es cierto: normalmente no generas un binario final como en C/C++; ejecutas tu código con `python3`.
+
+Pero la versión correcta (y útil) es esta:
+
+- **Tu archivo `.py` se compila a bytecode** (archivos `.pyc`)  
+- Ese bytecode lo ejecuta una **máquina virtual** (la VM de Python)  
+- La implementación más común se llama **CPython** (la que obtienes cuando instalas “Python” en la mayoría de sistemas)
+
+```mermaid
+flowchart LR
+  A["Código fuente (.py)"] --> B["Parser → AST"]
+  B --> C["Bytecode (.pyc)"]
+  C --> D["VM de Python (CPython)"]
+  D --> E["Resultado (stdout / archivos / red)"]
+```
+
+> **Conexión con el notebook**: en `02_fundamentos.md` y en el notebook se explica esto con más detalle (bytecode, `dis`, VM y por qué algunas cosas son más rápidas que otras).
+
+### Historia en 60 segundos (solo lo útil)
+
+- **Guido van Rossum** creó Python a finales de los 80 (el nombre viene de *Monty Python*).
+- Durante muchos años Guido fue el **BDFL** (*Benevolent Dictator For Life*): tomaba la decisión final de diseño.
+- Desde 2018 Python se gobierna más por **PEPs** (*Python Enhancement Proposals*) y el proceso comunitario.
+
 ---
 
 ## El REPL: tu calculadora interactiva
@@ -302,6 +328,46 @@ pip list
 
 # Desactivar el entorno virtual
 deactivate
+```
+
+### ¿Qué hay dentro de `venv/` (o `.venv/`)?
+
+Un entorno virtual es (básicamente) un directorio con:
+
+```
+venv/ o .venv/
+├── bin/                # ejecutables: python, pip, activate, etc.
+├── lib/                # librerías del entorno
+│   └── python3.X/
+│       └── site-packages/   # aquí se instalan los paquetes
+└── pyvenv.cfg          # metadata: versión, ruta base, etc.
+```
+
+### ¿Qué hace realmente “activar” el entorno?
+
+Cuando ejecutas:
+
+```bash
+source venv/bin/activate
+```
+
+no “metes Python dentro de otro Python”. Lo que pasa es más simple: tu shell ajusta variables de entorno (principalmente **`PATH`**) para que al escribir `python`/`pip` se usen los del entorno.
+
+```mermaid
+flowchart LR
+  A["Tu shell"] --> B["PATH prioriza venv/.venv/bin"]
+  B --> C["python/pip del entorno"]
+  C --> D["site-packages del entorno"]
+```
+
+### Cómo verificar que estás usando el Python correcto (debugging esencial)
+
+Estos comandos te dicen exactamente qué ejecutable y qué pip estás usando:
+
+```bash
+which python
+python -c "import sys; print(sys.executable)"
+python -m pip --version
 ```
 
 ### Reglas de oro
